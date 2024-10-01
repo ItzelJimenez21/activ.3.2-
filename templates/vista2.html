@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi primer analizador léxico y sintáctico web</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #8c8c8c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 800px;
+        }
+        .box {
+            background-color: #e8ecf8;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .flex-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+        .flex-item {
+            width: 48%;
+        }
+        textarea {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            background-color: white;
+            overflow: auto;
+            max-height: 300px;
+        }
+        input[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #cc3a92;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        input[type="submit"]:hover {
+            background-color: #c24ead;
+        }
+        .error {
+            color: rgb(168, 50, 127);
+            background-color: #ffffff;
+            border: 1px solid rgb(189, 49, 166);
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #f2f2f2;
+            border-radius: 8px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Mi primer analizador léxico y sintáctico web</h1>
+        <form method="post" enctype="multipart/form-data">
+            <div class="flex-container">
+                <div class="flex-item">
+                    <div class="box">
+                        <textarea name="text" rows="10" placeholder="Introduce tu texto aquí...">{{ text }}</textarea>
+                    </div>
+                    <input type="submit" value="Analizar">
+                </div>
+                <div class="flex-item">
+                    <div class="box">
+                        {% if tokens %}
+                        <textarea rows="10" readonly style="width: 95%;">
+{% for token in tokens %}
+{{ token[1] }}
+{% endfor %}
+                        </textarea>
+                        {% else %}
+                        <textarea rows="10" readonly style="width: 95%;">Tokens aparecerán aquí...</textarea>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <!-- Mostrar errores léxicos si existen -->
+        {% if lexico_error %}
+        <div class="error">
+            <strong>Error Léxico:</strong><br>
+            <pre>{{ lexico_error }}</pre>
+        </div>
+        {% endif %}
+        
+        <!-- Mostrar errores sintácticos si existen -->
+        {% if sintactico_errors %}
+        <div class="error">
+            <strong>Errores Sintácticos:</strong><br>
+            <pre>{{ sintactico_errors }}</pre>
+        </div>
+        {% endif %}
+
+        <!-- Tabla para el Analizador Léxico -->
+        {% if tokens %}
+        <div class="box">
+            <h2>Mi primer analizador Léxico</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Línea</th>
+                        <th>Lexema</th>
+                        <th>Simbolos</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for token in tokens %}
+                    <tr>
+                        <td>{{ token[2] }}</td> <!-- Línea -->
+                        <td>{{ token[0] }}</td> <!-- Lexema: ID o PR -->
+                        <td>{{ token[1] }}</td> <!-- Simbolos -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <!-- Tabla para el Analizador Sintáctico -->
+        {% if sintactico_result %}
+        <div class="box">
+            <h2>Mi primer analizador sintáctico</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Línea</th>
+                        <th>Token</th>
+                        <th>Escritura</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for token in tokens %}
+                    <tr>
+                        <td>{{ token[2] }}</td> <!-- Línea -->
+                        <td>{{ token[1] }}</td> <!-- Token: palabra -->
+                        <td>{{ 'Correcto' if token[0] == 'PR' else 'Incorrecto' }}</td> <!-- Correcto si es PR -->
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+    </div>
+</body>
+</html>
